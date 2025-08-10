@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Budget Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #ff9e00;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .card h2 i {
+            margin-right: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-value {
+            font-weight: 700;
+        }
+
+        .income .summary-value {
+            color: #28a745;
+        }
+
+        .expense .summary-value {
+            color: var(--danger);
+        }
+
+        .balance .summary-value {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .progress-container {
+            height: 12px;
+            background: var(--light-gray);
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .income-progress {
+            background: linear-gradient(90deg, #4cc9f0, #4895ef);
+        }
+
+        .expense-progress {
+            background: linear-gradient(90deg, #f72585, #b5179e);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .transaction-list {
+            margin-top: 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: var(--radius);
+            background: var(--light);
+            margin-bottom: 10px;
+            align-items: center;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .income-item {
+            border-left-color: #28a745;
+        }
+
+        .expense-item {
+            border-left-color: var(--danger);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .transaction-category {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .income-amount {
+            color: #28a745;
+        }
+
+        .expense-amount {
+            color: var(--danger);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            transition: color 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .section-title h2 {
+            color: var(--primary);
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: var(--light-gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab:not(.active):hover {
+            background: #d1d7e0;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        #income-tab:checked ~ .tab-content.income,
+        #expense-tab:checked ~ .tab-content.expense {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        /* Custom checkbox for category selection */
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .category-option {
+            position: relative;
+        }
+
+        .category-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .category-label {
+            display: block;
+            padding: 12px;
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-option input:checked + .category-label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .category-label i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .tip-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .print-btn {
+            background: var(--warning);
+            width: auto;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .print-btn i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-wallet"></i> Budget Planner</h1>
+            <p>Track your income and expenses without JavaScript - simple and effective budgeting</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2><i class="fas fa-chart-pie"></i> Budget Summary</h2>
+                <div class="summary-item income">
+                    <span>Total Income:</span>
+                    <span class="summary-value">$4,250.00</span>
+                </div>
+                <div class="summary-item expense">
+                    <span>Total Expenses:</span>
+                    <span class="summary-value">$2,980.00</span>
+                </div>
+                <div class="summary-item balance">
+                    <span>Remaining Balance:</span>
+                    <span class="summary-value">$1,270.00</span>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar income-progress" style="width: 70%"></div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar expense-progress" style="width: 50%"></div>
+                </div>
+
+                <div class="tip-box">
+                    <p><strong>Budgeting Tip:</strong> Aim to save at least 20% of your income each month. You're currently saving 30% - great job!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-calculator"></i> Budget Calculator</h2>
+                <form action="#" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount">Amount ($)</label>
+                            <input type="number" id="amount" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" class="form-control" placeholder="Salary, Rent, Groceries..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <div class="category-selector">
+                            <div class="category-option">
+                                <input type="radio" id="salary" name="category" value="salary" checked>
+                                <label for="salary" class="category-label">
+                                    <i class="fas fa-money-check"></i>
+                                    Salary
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" id="housing" name="category" value="housing">
+                                <label for="housing" class="category-label">
+                                    <i class="fas fa-home"></i>
+                                    Housing
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" id="food" name="category" value="food">
+                                <label for="food" class="category-label">
+                                    <i class="fas fa-utensils"></i>
+                                    Food
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" id="transport" name="category" value="transport">
+                                <label for="transport" class="category-label">
+                                    <i class="fas fa-bus"></i>
+                                    Transport
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" id="shopping" name="category" value="shopping">
+                                <label for="shopping" class="category-label">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Shopping
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" id="other" name="category" value="other">
+                                <label for="other" class="category-label">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    Other
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Transaction Type</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="radio" id="income" name="type" value="income" checked class="hidden">
+                                <label for="income" class="btn" style="background: #28a745;">Income</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="radio" id="expense" name="type" value="expense" class="hidden">
+                                <label for="expense" class="btn" style="background: var(--danger);">Expense</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn"><i class="fas fa-plus-circle"></i> Add Transaction</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <h2><i class="fas fa-exchange-alt"></i> Transaction History</h2>
+            <button class="btn print-btn"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+
+        <input type="radio" name="tabs" id="income-tab" class="hidden" checked>
+        <input type="radio" name="tabs" id="expense-tab" class="hidden">
+        
+        <div class="tabs">
+            <label for="income-tab" class="tab active">Income</label>
+            <label for="expense-tab" class="tab">Expenses</label>
+        </div>
+
+        <div class="tab-content income">
+            <div class="transaction-list">
+                <div class="transaction-item income-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Monthly Salary</div>
+                        <div class="transaction-category"><i class="fas fa-money-check"></i> Salary • Aug 5, 2023</div>
+                    </div>
+                    <div class="transaction-amount income-amount">+ $3,200.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                
+                <div class="transaction-item income-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Freelance Project</div>
+                        <div class="transaction-category"><i class="fas fa-laptop-code"></i> Other • Aug 12, 2023</div>
+                    </div>
+                    <div class="transaction-amount income-amount">+ $850.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                
+                <div class="transaction-item income-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Stock Dividends</div>
+                        <div class="transaction-category"><i class="fas fa-chart-line"></i> Other • Aug 18, 2023</div>
+                    </div>
+                    <div class="transaction-amount income-amount">+ $200.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content expense">
+            <div class="transaction-list">
+                <div class="transaction-item expense-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Apartment Rent</div>
+                        <div class="transaction-category"><i class="fas fa-home"></i> Housing • Aug 1, 2023</div>
+                    </div>
+                    <div class="transaction-amount expense-amount">- $1,200.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                
+                <div class="transaction-item expense-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Grocery Shopping</div>
+                        <div class="transaction-category"><i class="fas fa-shopping-basket"></i> Food • Aug 7, 2023</div>
+                    </div>
+                    <div class="transaction-amount expense-amount">- $180.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                
+                <div class="transaction-item expense-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Car Payment</div>
+                        <div class="transaction-category"><i class="fas fa-car"></i> Transport • Aug 10, 2023</div>
+                    </div>
+                    <div class="transaction-amount expense-amount">- $350.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                
+                <div class="transaction-item expense-item">
+                    <div class="transaction-details">
+                        <div class="transaction-title">Electricity Bill</div>
+                        <div class="transaction-category"><i class="fas fa-bolt"></i> Housing • Aug 14, 2023</div>
+                    </div>
+                    <div class="transaction-amount expense-amount">- $120.00</div>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Budget Planner &copy; 2023 | No JavaScript Required | Track Your Finances Securely</p>
+        </footer>
+    </div>
+</body>
+</html>
